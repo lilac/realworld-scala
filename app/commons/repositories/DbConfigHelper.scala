@@ -1,11 +1,10 @@
 package commons.repositories
 
-import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
-import slick.jdbc.{JdbcBackend, JdbcProfile}
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 
-class DbConfigHelper(dbConfigProvider: DatabaseConfigProvider) {
-  private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+class DbConfigHelper {
+  private val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default")
 
   val db: JdbcBackend#DatabaseDef = dbConfig.db
 

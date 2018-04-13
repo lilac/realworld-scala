@@ -7,6 +7,10 @@ lazy val root = (project in file("."))
 
 scalaVersion := "2.12.4"
 
+val akkaHttpVersion = "10.0.10"
+
+def akkaHttp = "com.typesafe.akka" %% "akka-http" % akkaHttpVersion
+
 libraryDependencies ++= Seq(
   filters,
   evolutions,
@@ -26,6 +30,8 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-http" % "2.2.1",
   "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
+  "org.flywaydb" % "flyway-core" % "5.0.7",
+  akkaHttp,
 )
 
 fork in run := true
