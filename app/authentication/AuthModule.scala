@@ -1,6 +1,5 @@
 package authentication
 
-import authentication.pac4j.services.JwtTokenGenerator
 import authentication.repositories.SecurityUserRepo
 import authentication.services.SecurityUserService
 import commons.CommonsModule
@@ -19,9 +18,9 @@ class AuthModule(configuration: Configuration) {
 
   private lazy val signatureConfig = new SecretSignatureConfiguration(secret)
   protected lazy val jwtGenerator: JwtGenerator[CommonProfile] = new JwtGenerator(signatureConfig)
-  lazy val pack4jJwtAuthenticator: TokenGenerator[SecurityUserIdProfile, JwtToken] = new JwtTokenGenerator(dateTimeProvider, jwtGenerator)
+  lazy val authenticator = new JwtAuthenticator(secret)
 
-  private val securityUserService = new SecurityUserService(securityUserRepo, dateTimeProvider, CommonsModule.actionRunner)
+  lazy val securityUserService = new SecurityUserService(securityUserRepo, dateTimeProvider, CommonsModule.actionRunner)
   lazy val securityUserCreator: SecurityUserCreator = securityUserService
   lazy val securityUserProvider: SecurityUserProvider = securityUserService
   lazy val securityUserUpdater: SecurityUserUpdater = securityUserService

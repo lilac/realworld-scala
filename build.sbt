@@ -31,7 +31,8 @@ libraryDependencies ++= Seq(
   "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
   "org.flywaydb" % "flyway-core" % "5.0.7",
-  akkaHttp,
+  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
+  akkaHttp
 )
 
 fork in run := true

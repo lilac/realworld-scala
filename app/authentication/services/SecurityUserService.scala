@@ -46,4 +46,9 @@ private[authentication] class SecurityUserService(securityUserRepo: SecurityUser
     val hash = hashPass(newPassword)
     securityUserRepo.updateAndGet(securityUser.copy(password = hash))
   }
+
+  override def findById(id: SecurityUserId): DBIO[Option[SecurityUser]] = {
+    require(id != null)
+    securityUserRepo.findById(id)
+  }
 }

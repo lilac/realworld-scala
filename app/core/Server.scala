@@ -45,8 +45,6 @@ object Server {
       if (args.isEmpty) 9000
       else args.head.toInt
 
-    //    val config = ConfigFactory.load().getConfig("web")
-    //    val production = config.getBoolean("production")
     migrate()
 
     val route: Route = concat(
