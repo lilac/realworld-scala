@@ -2,7 +2,7 @@ package core.users
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-import authentication.JwtAuthenticator
+import authentication.services.JwtTokenGenerator
 import commons.services.ActionRunner
 import core.commons.HandlerUtil.handleFailedValidation
 import core.users.models._
@@ -14,7 +14,7 @@ import play.api.libs.json.{ JsValue, Json }
  */
 class UserHandlers(actionRunner: ActionRunner,
                    userRegistrationService: UserRegistrationService,
-                   authenticator: JwtAuthenticator) {
+                   authenticator: JwtTokenGenerator) {
 
   def register(user: UserRegistration)(implicit ec: ExecutionContext): Future[JsValue] = {
     actionRunner

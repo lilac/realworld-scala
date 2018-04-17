@@ -3,7 +3,7 @@ package core.users.controllers
 import commons.services.ActionRunner
 import core.authentication.api._
 import core.commons.controllers.RealWorldAbstractController
-import core.users.models.{UserDetailsWithToken, UserDetailsWithTokenWrapper}
+import core.users.models.{ UserDetailsWithToken, UserDetailsWithTokenWrapper }
 import core.users.services.UserService
 import play.api.libs.json._
 import play.api.mvc._
@@ -15,7 +15,7 @@ class LoginController(actionRunner: ActionRunner,
 
   def login: Action[CredentialsWrapper] = Action.async(validateJson[CredentialsWrapper]) { request =>
     val email = request.body.user.email
-    val loginAction = authenticator.authenticate(request)
+    val loginAction = authenticator.authenticate(request.body)
       .zip(userService.getUserDetails(email))
       .map(tokenAndUserDetails => UserDetailsWithToken(tokenAndUserDetails._2, tokenAndUserDetails._1))
       .map(UserDetailsWithTokenWrapper(_))

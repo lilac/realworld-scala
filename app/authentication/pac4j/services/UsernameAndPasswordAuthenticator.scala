@@ -1,14 +1,13 @@
 package authentication.pac4j.services
 
+import scala.concurrent.ExecutionContext
+
 import authentication.repositories.SecurityUserRepo
 import commons.services.ActionRunner
 import commons.utils.DbioUtils.optionToDbio
-import core.authentication.api.{MissingSecurityUserException, _}
+import core.authentication.api.{ MissingSecurityUserException, _ }
 import org.mindrot.jbcrypt.BCrypt
-import play.api.mvc.Request
 import slick.dbio.DBIO
-
-import scala.concurrent.ExecutionContext
 
 private[authentication] class UsernameAndPasswordAuthenticator(tokenGenerator: TokenGenerator[SecurityUserIdProfile, JwtToken],
                                                                actionRunner: ActionRunner,
@@ -16,10 +15,8 @@ private[authentication] class UsernameAndPasswordAuthenticator(tokenGenerator: T
                                                               (implicit private val ec: ExecutionContext)
   extends Authenticator[CredentialsWrapper] {
 
-  override def authenticate(request: Request[CredentialsWrapper]): DBIO[String] = {
-    require(request != null)
-
-    val credentials = request.body.user
+  override def authenticate(value: CredentialsWrapper): DBIO[String] = {
+    val credentials = value.user
 
     val rawEmail = credentials.email.value
     securityUserRepo.findByEmail(credentials.email)

@@ -2,10 +2,12 @@ package core.users
 
 import scala.concurrent.ExecutionContext
 
+import akka.http.scaladsl.server.PathMatcher._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives._
 import authentication.AuthModule
 import commons.utils.PlayJsonSupport
+import core.authentication.api.CredentialsWrapper
 import core.users.models.{ UpdateUserWrapper, UserRegistrationWrapper }
 import play.api.Configuration
 
@@ -24,6 +26,10 @@ class UserRouter(val configuration: Configuration)(
   import akka.http.scaladsl.server.directives.RouteDirectives.complete
   import authModule.authenticator.authenticated
 
+  val loginRoute: Route =
+    entity(as[CredentialsWrapper])(body =>
+      ctx => ctx.complete(userModule.loginHandler.login(body)))
+
   val routes: Route = {
     concat(
       (path("users") & post) {
@@ -33,7 +39,8 @@ class UserRouter(val configuration: Configuration)(
       /*authenticated { authInfo =>
         (path("user") & put) (updateRoute(authInfo))
       },*/
-      (path("user") & put) (authenticated(updateRoute))
+      (path("user") & put) (authenticated(updateRoute)),
+      (path("users" / "login") & post) (loginRoute)
     )
   }
 
