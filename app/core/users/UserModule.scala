@@ -4,6 +4,7 @@ import scala.concurrent.ExecutionContext
 
 import authentication.AuthModule
 import commons.CommonsModule
+import core.users.handlers.{ GetHandler, LoginHandler, RegisterHandler, UpdateHandler }
 import core.users.repositories.UserRepo
 import core.users.services._
 import play.api.Configuration
@@ -18,13 +19,13 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
   import authModule.securityUserProvider
 
   // handlers
-  lazy val userHandlers: UserHandlers = new UserHandlers(
+  lazy val registerHandler: RegisterHandler = new RegisterHandler(
     actionRunner,
     userRegistrationService,
     authModule.jwtGenerator)
-  lazy val userUpdateHandler = new UserUpdateHandler(actionRunner, userService, authModule.securityUserProvider)
+  lazy val updateHandler = new UpdateHandler(actionRunner, userService, authModule.securityUserProvider)
   lazy val loginHandler = new LoginHandler(actionRunner, authModule.passAuthenticator, userService)
-  lazy val userGetHandler = new UserGetHandler(actionRunner, userService)
+  lazy val getHandler = new GetHandler(actionRunner, userService)
   // repo
   lazy val userRepo: UserRepo = new UserRepo
 

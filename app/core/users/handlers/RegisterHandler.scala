@@ -1,4 +1,4 @@
-package core.users
+package core.users.handlers
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -12,11 +12,13 @@ import play.api.libs.json.{ JsValue, Json }
 /**
  * Copyright SameMo 2018
  */
-class UserHandlers(actionRunner: ActionRunner,
-                   userRegistrationService: UserRegistrationService,
-                   authenticator: JwtTokenGenerator) {
+class RegisterHandler(actionRunner: ActionRunner,
+                      userRegistrationService: UserRegistrationService,
+                      authenticator: JwtTokenGenerator)(
+                       implicit executionContext: ExecutionContext)
+  extends (UserRegistration => Future[JsValue]) {
 
-  def register(user: UserRegistration)(implicit ec: ExecutionContext): Future[JsValue] = {
+  def apply(user: UserRegistration): Future[JsValue] = {
     actionRunner
       .runTransactionally(userRegistrationService.register(user))
       .map(userAndSecurityUserId => {

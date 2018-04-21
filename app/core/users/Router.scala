@@ -14,7 +14,7 @@ import play.api.Configuration
 /**
  * Copyright SameMo 2018
  */
-class UserRouter(val configuration: Configuration)(
+class Router(val configuration: Configuration)(
   implicit val executionContext: ExecutionContext)
   extends PlayJsonSupport {
   lazy val authModule: AuthModule = new AuthModule(configuration)
@@ -28,7 +28,7 @@ class UserRouter(val configuration: Configuration)(
 
   val getRoute: AuthRoute = { user: AuthenticatedUser =>
     ctx =>
-      ctx.complete(userModule.userGetHandler(user))
+      ctx.complete(userModule.getHandler(user))
   }
 
   val loginRoute: Route =
@@ -39,7 +39,7 @@ class UserRouter(val configuration: Configuration)(
     concat(
       (path("users") & post) {
         entity(as[UserRegistrationWrapper])(body =>
-          complete(userModule.userHandlers.register(body.user)))
+          complete(userModule.registerHandler(body.user)))
       },
       (path("user") & put) (requireUser(updateRoute)),
       (path("user") & get) (requireUser(getRoute)),
@@ -50,6 +50,6 @@ class UserRouter(val configuration: Configuration)(
   type AuthRoute = AuthenticatedUser => Route
   lazy val updateRoute: AuthRoute = { user: AuthenticatedUser =>
     entity(as[UpdateUserWrapper])(body =>
-      complete(userModule.userUpdateHandler(user, body.user)))
+      complete(userModule.updateHandler(user, body.user)))
   }
 }

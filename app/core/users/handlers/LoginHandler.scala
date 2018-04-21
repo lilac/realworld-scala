@@ -1,4 +1,4 @@
-package core.users
+package core.users.handlers
 
 import scala.concurrent.{ ExecutionContext, Future }
 

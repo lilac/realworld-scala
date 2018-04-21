@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.Directives.{ concat, pathPrefix }
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{ Config, ConfigFactory }
-import core.users.UserRouter
+import core.users.{ Router => UserRouter }
 import org.flywaydb.core.Flyway
 import play.api.Configuration
 
@@ -22,7 +22,7 @@ object Server {
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  lazy val userRouter: UserRouter = new UserRouter(configuration)
+  lazy val userRoute: Route = new UserRouter(configuration).routes
   lazy val flyway = new Flyway()
 
   val config: Config = ConfigFactory.load()
@@ -51,7 +51,7 @@ object Server {
       //        cors()(
       pathPrefix("api")(
         concat(
-          userRouter.routes
+          userRoute
         )
       )
     )

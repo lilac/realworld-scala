@@ -1,4 +1,4 @@
-package core.users
+package core.users.handlers
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -11,7 +11,7 @@ import play.api.libs.json.{ JsValue, Json }
 /**
  * Copyright SameMo 2018
  */
-class UserGetHandler(actionRunner: ActionRunner, userService: UserService)(
+class GetHandler(actionRunner: ActionRunner, userService: UserService)(
   implicit ec: ExecutionContext)
   extends (AuthenticatedUser => Future[JsValue]) {
   override def apply(user: AuthenticatedUser): Future[JsValue] = {
