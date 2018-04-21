@@ -24,6 +24,8 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
     authModule.jwtGenerator)
   lazy val userUpdateHandler = new UserUpdateHandler(actionRunner, userService, authModule.securityUserProvider)
   lazy val loginHandler = new LoginHandler(actionRunner, authModule.passAuthenticator, userService)
+  lazy val userGetHandler = new UserGetHandler(actionRunner, userService)
+  // repo
   lazy val userRepo: UserRepo = new UserRepo
 
   // services

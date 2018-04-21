@@ -6,13 +6,15 @@ import akka.http.scaladsl.server.directives.BasicDirectives._
 import akka.http.scaladsl.server.directives.HeaderDirectives._
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import authentikat.jwt.JsonWebToken
+import commons.utils.PlayJsonSupport
 import org.json4s.JValue
 import org.json4s.JsonAST.{ JInt, JNothing }
+import play.api.libs.json.{ JsObject, JsString }
 
 /**
  * Copyright SameMo 2018
  */
-class JwtAuthenticator(secret: String) {
+class JwtAuthenticator(secret: String) extends PlayJsonSupport {
 
   import JwtAuthenticator._
 
@@ -25,7 +27,7 @@ class JwtAuthenticator(secret: String) {
       }
       tok match {
         case Some(jwt) if isTokenExpired(jwt) =>
-          complete(StatusCodes.Unauthorized -> "Token expired.")
+          complete(StatusCodes.Unauthorized -> JsObject(Map("error" -> JsString("Token expired."))))
 
         case Some(jwt) if JsonWebToken.validate(jwt, secret) =>
           val claims = getClaims(jwt).getOrElse(JNothing)

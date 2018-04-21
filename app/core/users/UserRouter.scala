@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives._
 import authentication.AuthModule
 import commons.utils.PlayJsonSupport
-import core.authentication.api.CredentialsWrapper
+import core.authentication.api.{ AuthenticatedUser, CredentialsWrapper }
 import core.users.models.{ UpdateUserWrapper, UserRegistrationWrapper }
 import play.api.Configuration
 
@@ -24,7 +24,12 @@ class UserRouter(val configuration: Configuration)(
   import akka.http.scaladsl.server.directives.MarshallingDirectives._
   import akka.http.scaladsl.server.directives.PathDirectives.path
   import akka.http.scaladsl.server.directives.RouteDirectives.complete
-  import authModule.authenticator.authenticated
+  import authModule.userMiddleware.requireUser
+
+  val getRoute: AuthRoute = { user: AuthenticatedUser =>
+    ctx =>
+      ctx.complete(userModule.userGetHandler(user))
+  }
 
   val loginRoute: Route =
     entity(as[CredentialsWrapper])(body =>
@@ -39,16 +44,15 @@ class UserRouter(val configuration: Configuration)(
       /*authenticated { authInfo =>
         (path("user") & put) (updateRoute(authInfo))
       },*/
-      (path("user") & put) (authenticated(updateRoute)),
+      (path("user") & put) (requireUser(updateRoute)),
+      (path("user") & get) (requireUser(getRoute)),
       (path("users" / "login") & post) (loginRoute)
     )
   }
 
-  import authentication.JwtAuthenticator.AuthInfo
-
-  type AuthRoute = AuthInfo => Route
-  lazy val updateRoute: AuthRoute = { authInfo: AuthInfo =>
+  type AuthRoute = AuthenticatedUser => Route
+  lazy val updateRoute: AuthRoute = { user: AuthenticatedUser =>
     entity(as[UpdateUserWrapper])(body =>
-      complete(userModule.userUpdateHandler(authInfo, body.user)))
+      complete(userModule.userUpdateHandler(user, body.user)))
   }
 }
