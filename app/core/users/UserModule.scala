@@ -3,9 +3,10 @@ package core.users
 import scala.concurrent.ExecutionContext
 
 import authentication.AuthModule
+import com.softwaremill.macwire.wire
 import commons.CommonsModule
-import core.users.handlers.{ GetHandler, LoginHandler, RegisterHandler, UpdateHandler }
-import core.users.repositories.UserRepo
+import core.users.handlers._
+import core.users.repositories.{ FollowAssociationRepo, ProfileRepo, UserRepo }
 import core.users.services._
 import play.api.Configuration
 
@@ -26,8 +27,13 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
   lazy val updateHandler = new UpdateHandler(actionRunner, userService, authModule.securityUserProvider)
   lazy val loginHandler = new LoginHandler(actionRunner, authModule.passAuthenticator, userService)
   lazy val getHandler = new GetHandler(actionRunner, userService)
+  lazy val followHandler = new FollowHandler(actionRunner, profileService)
+  lazy val unfollowHandler = new UnfollowHandler(actionRunner, profileService)
+
   // repo
   lazy val userRepo: UserRepo = new UserRepo
+  lazy val profileRepo = new ProfileRepo(userRepo, followAssociationRepo, ec)
+  lazy val followAssociationRepo: FollowAssociationRepo = new FollowAssociationRepo
 
   // services
   lazy val userRegistrationService: UserRegistrationService =
@@ -42,6 +48,8 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
     CommonsModule.dateTimeProvider,
     userUpdateValidator,
     ec)
+  lazy val profileService: ProfileService = wire[ProfileService]
+
   // validators
   lazy val userRegistrationValidator: UserRegistrationValidator =
     new UserRegistrationValidator(passwordValidator,
