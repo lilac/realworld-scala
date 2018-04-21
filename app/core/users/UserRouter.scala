@@ -24,7 +24,7 @@ class UserRouter(val configuration: Configuration)(
   import akka.http.scaladsl.server.directives.MarshallingDirectives._
   import akka.http.scaladsl.server.directives.PathDirectives.path
   import akka.http.scaladsl.server.directives.RouteDirectives.complete
-  import authModule.userMiddleware.requireUser
+  import authModule.authMiddleware.requireUser
 
   val getRoute: AuthRoute = { user: AuthenticatedUser =>
     ctx =>
@@ -41,9 +41,6 @@ class UserRouter(val configuration: Configuration)(
         entity(as[UserRegistrationWrapper])(body =>
           complete(userModule.userHandlers.register(body.user)))
       },
-      /*authenticated { authInfo =>
-        (path("user") & put) (updateRoute(authInfo))
-      },*/
       (path("user") & put) (requireUser(updateRoute)),
       (path("user") & get) (requireUser(getRoute)),
       (path("users" / "login") & post) (loginRoute)
