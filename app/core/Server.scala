@@ -59,6 +59,10 @@ object Server {
     Await.result(Http().bindAndHandle(route, "0.0.0.0", port), 1.seconds)
     println(s"Server started (port: $port)")
 
+    // start h2 console server
+    import org.h2.tools.{ Server => H2Server }
+    H2Server.createWebServer("-webAllowOthers").start()
+
     Await.result(system.whenTerminated, Duration.Inf)
   }
 }
