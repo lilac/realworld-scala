@@ -21,11 +21,21 @@ class AuthMiddleware(
                       actionRunner: ActionRunner)(implicit ec: ExecutionContext) {
 
   def extractUser: Directive1[AuthenticatedUser] =
-    authenticator.authenticated.flatMap { authInfo =>
-      val f = getUser(authInfo).map { user =>
+    authenticatedUser.flatMap { f =>
+      FutureDirectives.onSuccess(f)
+    }
+
+  def optionalUser: Directive1[Option[AuthenticatedUser]] =
+    for {
+      f <- authenticatedUser
+      d <- FutureDirectives.onComplete(f).map(_.toOption)
+    } yield d
+
+  def authenticatedUser: Directive1[Future[AuthenticatedUser]] =
+    authenticator.authenticated.map { authInfo =>
+      getUser(authInfo).map { user =>
         AuthenticatedUser(user.email, authInfo._1)
       }
-      FutureDirectives.onSuccess(f)
     }
 
   def requireUser: Directive1[AuthenticatedUser] = handleExceptions(exceptionHandler) & extractUser

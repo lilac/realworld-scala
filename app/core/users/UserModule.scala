@@ -17,6 +17,8 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
   implicit ec: ExecutionContext) {
 
   import CommonsModule.actionRunner
+  import CommonsModule.dateTimeProvider
+  import authModule.securityUserUpdater
   import authModule.securityUserProvider
 
   // handlers
@@ -29,6 +31,7 @@ class UserModule(configuration: Configuration, authModule: AuthModule)(
   lazy val getHandler = new GetHandler(actionRunner, userService)
   lazy val followHandler = new FollowHandler(actionRunner, profileService)
   lazy val unfollowHandler = new UnfollowHandler(actionRunner, profileService)
+  lazy val profileHandler = new ProfileHandler(actionRunner, profileService)
 
   // repo
   lazy val userRepo: UserRepo = new UserRepo

@@ -29,7 +29,7 @@ class Router(val configuration: Configuration)(
   import akka.http.scaladsl.server.directives.MarshallingDirectives._
   import akka.http.scaladsl.server.directives.PathDirectives.path
   import akka.http.scaladsl.server.directives.RouteDirectives.complete
-  import authModule.authMiddleware.requireUser
+  import authModule.authMiddleware.{ optionalUser, requireUser }
 
   val getRoute: AuthRoute = { user: AuthenticatedUser =>
     ctx =>
@@ -50,6 +50,11 @@ class Router(val configuration: Configuration)(
     ctx.complete(userModule.unfollowHandler(user, username))
   }
 
+  def getProfileRoute(s: String, user: Option[AuthenticatedUser]): Route = { ctx =>
+    val username = Username(s)
+    ctx.complete(userModule.profileHandler(user, username))
+  }
+
   val routes: Route = {
     concat(
       (path("users") & post) {
@@ -66,7 +71,8 @@ class Router(val configuration: Configuration)(
   lazy val profileRoute: Route = handleExceptions(exceptionHandler)(
     concat(
       (path("profiles" / Segment / "follow") & post & requireUser) (followRoute),
-      (path("profiles" / Segment / "follow") & delete & requireUser) (unfollowRoute)
+      (path("profiles" / Segment / "follow") & delete & requireUser) (unfollowRoute),
+      (path("profiles" / Segment) & get & optionalUser) (getProfileRoute)
     )
   )
 
