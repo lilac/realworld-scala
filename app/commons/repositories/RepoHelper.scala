@@ -14,4 +14,6 @@ object RepoHelper {
     case Ascending => SlickOrdering.Asc
     case Descending => SlickOrdering.Desc
   }
+
+  val api = slick.jdbc.MySQLProfile.api
 }

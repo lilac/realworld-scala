@@ -9,7 +9,7 @@ import commons.repositories.mappings.JavaTimeDbMappings
 import authentication.models.{PasswordHash, SecurityUser, SecurityUserId}
 import commons.utils.DbioUtils.optionToDbio
 import slick.dbio.DBIO
-import slick.jdbc.H2Profile.api.{DBIO => _, MappedTo => _, Rep => _, TableQuery => _, _}
+import RepoHelper.api.{ DBIO => _, MappedTo => _, Rep => _, TableQuery => _, _ }
 import slick.lifted.{ProvenShape, _}
 
 import scala.concurrent.ExecutionContext

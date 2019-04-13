@@ -12,7 +12,7 @@ import users.models.{User, UserId}
 import users.repositories.{FollowAssociationRepo, UserRepo, UserTable}
 import org.apache.commons.lang3.StringUtils
 import slick.dbio.DBIO
-import slick.jdbc.H2Profile.api.{DBIO => _, MappedTo => _, Rep => _, TableQuery => _, _}
+import RepoHelper.api.{ DBIO => _, MappedTo => _, Rep => _, TableQuery => _, _ }
 import slick.lifted.{ProvenShape, Rep}
 
 import scala.concurrent.ExecutionContext
