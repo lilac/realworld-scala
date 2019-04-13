@@ -48,6 +48,13 @@ class RealWorldComponents(context: Context) extends BuiltInComponentsFromContext
   def onStart(): Unit = {
     // applicationEvolutions is a val and requires evaluation
     applicationEvolutions
+    if (application.mode == Mode.Dev) {
+      // start h2 console server
+      import org.h2.tools.{ Server => H2Server }
+      val server = H2Server.createWebServer("-webAllowOthers", "-browser")
+      server.start()
+      println(server.getStatus)
+    }
   }
 
   onStart()
