@@ -21,7 +21,27 @@ import play.filters.cors.{CORSConfig, CORSFilter}
 import slick.basic.{BasicProfile, DatabaseConfig}
 
 class RealWorldApplicationLoader extends ApplicationLoader {
-  def load(context: Context): Application = new RealWorldComponents(context).application
+
+  def load(context: Context): Application = {
+    startH2(context)
+    new RealWorldComponents(context).application
+  }
+
+  def startH2(context: Context) = {
+    import org.h2.tools.{ Server => H2Server }
+    import org.h2.jdbc.JdbcSQLException
+
+    if (context.environment.mode == Mode.Dev) {
+      // start h2 console server
+      try {
+        val server = H2Server.createWebServer("-webAllowOthers", "-browser")
+        server.start()
+        println(server.getStatus)
+      } catch {
+        case _: JdbcSQLException => ()
+      }
+    }
+  }
 }
 
 class RealWorldComponents(context: Context) extends BuiltInComponentsFromContext(context)
@@ -48,13 +68,6 @@ class RealWorldComponents(context: Context) extends BuiltInComponentsFromContext
   def onStart(): Unit = {
     // applicationEvolutions is a val and requires evaluation
     applicationEvolutions
-    if (application.mode == Mode.Dev) {
-      // start h2 console server
-      import org.h2.tools.{ Server => H2Server }
-      val server = H2Server.createWebServer("-webAllowOthers", "-browser")
-      server.start()
-      println(server.getStatus)
-    }
   }
 
   onStart()
