@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" %% "play-pac4j" % "5.0.0",
   "org.pac4j" % "pac4j-jwt" % "2.3.1",
   "org.pac4j" % "pac4j-http" % "2.3.1",
+  "mysql" % "mysql-connector-java" % "5.1.41",
 
   "com.softwaremill.macwire" %% "macros" % "2.3.1" % "provided",
 
