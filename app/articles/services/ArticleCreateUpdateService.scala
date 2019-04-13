@@ -94,7 +94,7 @@ trait ArticleCreateUpdateService {
 
   private def createUpdatedArticle(articleUpdate: ArticleUpdate, article: Article) = {
     val title = articleUpdate.title.getOrElse(article.title)
-    val slug = slugifier.slugify(title)
+    val slug = if (title == article.title) article.slug else slugifier.slugify(title)
     val description = articleUpdate.description.getOrElse(article.description)
     val body = articleUpdate.body.getOrElse(article.body)
     val updatedArticle = article.copy(title = title, slug = slug, description = description, body = body,
