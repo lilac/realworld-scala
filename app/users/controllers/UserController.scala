@@ -2,10 +2,10 @@ package users.controllers
 
 import commons.services.ActionRunner
 import authentication.api._
-import authentication.models.{JwtToken, SecurityUserId, SecurityUserIdProfile}
+import authentication.models.{ JwtToken, SecurityUserId, SecurityUserIdProfile }
 import commons.controllers.RealWorldAbstractController
 import users.models._
-import users.services.{UserRegistrationService, UserService}
+import users.services.{ GithubService, UserRegistrationService, UserService }
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -13,6 +13,7 @@ class UserController(authenticatedAction: AuthenticatedActionBuilder,
                      actionRunner: ActionRunner,
                      userRegistrationService: UserRegistrationService,
                      userService: UserService,
+                     githubService: GithubService,
                      jwtAuthenticator: TokenGenerator[SecurityUserIdProfile, JwtToken],
                      components: ControllerComponents)
   extends RealWorldAbstractController(components) {
@@ -48,6 +49,25 @@ class UserController(authenticatedAction: AuthenticatedActionBuilder,
       .map(Json.toJson(_))
       .map(Ok(_))
       .recover(handleFailedValidation)
+  }
+
+  def githubLogin: Action[OAuthCode] = Action.async(validateJson[OAuthCode]) { request =>
+    val code = request.body
+    githubService.authenticate(code)
+      .map(userAndSecurityUserId => {
+        val (user, securityUserId) = userAndSecurityUserId
+        val jwtToken: JwtToken = generateToken(securityUserId)
+        UserDetailsWithToken(user.email,
+          user.username,
+          user.createdAt,
+          user.updatedAt,
+          user.bio,
+          user.image,
+          jwtToken.token)
+      })
+      .map(UserDetailsWithTokenWrapper(_))
+      .map(Json.toJson(_))
+      .map(Ok(_))
   }
 
   private def generateToken(securityUserId: SecurityUserId) = {

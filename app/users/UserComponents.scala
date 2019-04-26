@@ -1,18 +1,26 @@
 package users
 
+import scala.concurrent.ExecutionContext
+
 import com.softwaremill.macwire.wire
-import commons.config.{WithControllerComponents, WithExecutionContextComponents}
+import commons.config.{ WithControllerComponents, WithExecutionContextComponents }
 import commons.models.Username
 import authentication.AuthenticationComponents
 import play.api.routing.Router
 import play.api.routing.sird._
-import users.controllers.{LoginController, ProfileController, UserController}
-import users.repositories.{FollowAssociationRepo, ProfileRepo, UserRepo}
+import users.controllers.{ LoginController, ProfileController, UserController }
+import users.repositories.{ FollowAssociationRepo, ProfileRepo, UserRepo }
 import users.services._
+import play.api.libs.ws.ahc.AhcWSComponents
 
-trait UserComponents extends AuthenticationComponents with WithControllerComponents with WithExecutionContextComponents {
+trait UserComponents extends AuthenticationComponents
+  with WithControllerComponents
+  with WithExecutionContextComponents
+  with AhcWSComponents {
   lazy val userController: UserController = wire[UserController]
   lazy val userService: UserService = wire[UserService]
+  private implicit val ec: ExecutionContext = executionContext
+  lazy val githubService: GithubService = wire[GithubService]
   lazy val userRepo: UserRepo = wire[UserRepo]
   lazy val userRegistrationService: UserRegistrationService = wire[UserRegistrationService]
   lazy val userRegistrationValidator: UserRegistrationValidator = wire[UserRegistrationValidator]
@@ -37,6 +45,8 @@ trait UserComponents extends AuthenticationComponents with WithControllerCompone
       userController.getCurrentUser
     case POST(p"/users/login") =>
       loginController.login
+    case POST(p"/users/oauth") =>
+      userController.githubLogin
     case PUT(p"/user") =>
       userController.update
     case GET(p"/profiles/$rawUsername") =>

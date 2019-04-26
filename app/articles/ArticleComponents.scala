@@ -1,10 +1,12 @@
 package articles
 
+import scala.concurrent.ExecutionContext
+
 import com.softwaremill.macwire.wire
-import commons.config.{WithControllerComponents, WithExecutionContextComponents}
+import commons.config.{ WithControllerComponents, WithExecutionContextComponents }
 import commons.models._
-import articles.controllers.{ArticleController, CommentController, TagController}
-import articles.models.{ArticleMetaModel, CommentId, MainFeedPageRequest, UserFeedPageRequest}
+import articles.controllers.{ ArticleController, CommentController, TagController }
+import articles.models.{ ArticleMetaModel, CommentId, MainFeedPageRequest, UserFeedPageRequest }
 import articles.repositories._
 import articles.services._
 import authentication.api.AuthenticatedActionBuilder
@@ -21,6 +23,7 @@ trait ArticleComponents
 
   private lazy val defaultOffset = 0L
   private lazy val defaultLimit = 20L
+  private implicit val ec: ExecutionContext = executionContext
 
   def authenticatedAction: AuthenticatedActionBuilder
 
