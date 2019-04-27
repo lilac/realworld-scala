@@ -1,13 +1,15 @@
 package articles.services
 
 import commons.models.Email
-import articles.models.{Article, ArticleWithTags, FavoriteAssociation, FavoriteAssociationId}
-import articles.repositories.{ArticleRepo, ArticleWithTagsRepo, FavoriteAssociationRepo}
+import articles.models.{ Article, ArticleWithTags, FavoriteAssociation, FavoriteAssociationId }
+import articles.repositories.{ ArticleRepo, ArticleWithTagsRepo, FavoriteAssociationRepo }
 import users.models.User
 import users.repositories.UserRepo
 import slick.dbio.DBIO
-
 import scala.concurrent.ExecutionContext
+
+import commons.exceptions.MissingModelException
+import commons.utils.DbioUtils
 
 trait ArticleFavoriteService {
   protected val articleRepo: ArticleRepo
@@ -45,9 +47,12 @@ trait ArticleFavoriteService {
   }
 
   private def deleteFavoriteAssociation(user: User, article: Article) = {
-    favoriteAssociationRepo.findByUserAndArticle(user.id, article.id)
-      .flatMap(_.map(favoriteAssociation => favoriteAssociationRepo.delete(favoriteAssociation.id))
-        .getOrElse(DBIO.successful(())))
+    for {
+      option <- favoriteAssociationRepo.findByUserAndArticle(user.id, article.id)
+      association <- DbioUtils.optionToDbio(option,
+        new MissingModelException(s"User ${user.username} favorite ${article.id}"))
+      id <- favoriteAssociationRepo.delete(association.id)
+    } yield id
   }
 
 }

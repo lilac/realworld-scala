@@ -1,13 +1,15 @@
 package users.services
 
-import commons.models.{Email, Username}
+import commons.models.{ Email, Username }
 import commons.repositories.DateTimeProvider
 import authentication.api._
-import users.models.{FollowAssociation, FollowAssociationId, Profile, User}
-import users.repositories.{FollowAssociationRepo, ProfileRepo, UserRepo}
+import users.models.{ FollowAssociation, FollowAssociationId, Profile, User }
+import users.repositories.{ FollowAssociationRepo, ProfileRepo, UserRepo }
 import slick.dbio.DBIO
-
 import scala.concurrent.ExecutionContext
+
+import commons.exceptions.MissingModelException
+import commons.utils.DbioUtils
 
 private[users] class ProfileService(userRepo: UserRepo,
                                     followAssociationRepo: FollowAssociationRepo,
@@ -29,8 +31,12 @@ private[users] class ProfileService(userRepo: UserRepo,
   }
 
   private def deleteFollowAssociation(follower: User, followed: User) = {
-    followAssociationRepo.findByFollowerAndFollowed(follower.id, followed.id)
-      .map(_.map(followAssociation => followAssociationRepo.delete(followAssociation.id)))
+    for {
+      option <- followAssociationRepo.findByFollowerAndFollowed(follower.id, followed.id)
+      followAssociation <- DbioUtils.optionToDbio(option,
+        new MissingModelException(s"User ${follower.username} following ${followed.username}"))
+      id <- followAssociationRepo.delete(followAssociation.id)
+    } yield id
   }
 
   def follow(followedUsername: Username, followerEmail: Email): DBIO[Profile] = {
