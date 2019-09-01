@@ -47,10 +47,10 @@ class RealWorldComponents(context: Context)
   with EvolutionsComponents
   with AhcWSComponents
   with AuthenticationComponents
-  with UserComponents
   with EhCacheComponents {
 
   val articleComponents: ArticleComponents = wire[ArticleComponents]
+  private val userComponents = wire[UserComponents]
   override lazy val dynamicEvolutions: DynamicEvolutions = new DynamicEvolutions
 
   def onStart(): Unit = {
@@ -65,7 +65,8 @@ class RealWorldComponents(context: Context)
     _.configure(context.environment, context.initialConfiguration, Map.empty)
   }
 
-  override lazy val routes: PartialFunction[RequestHeader, Handler] = userRoutes.orElse(articleComponents.routes)
+  override lazy val routes: PartialFunction[RequestHeader, Handler] = userComponents.routes
+    .orElse(articleComponents.routes)
 
   override lazy val defaultCacheApi: AsyncCacheApi = cacheApi(UUID.randomUUID().toString)
 }

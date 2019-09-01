@@ -7,10 +7,7 @@ import articles.models.{ ArticleMetaModel, CommentId, MainFeedPageRequest, UserF
 import articles.repositories._
 import articles.services._
 import com.softwaremill.macwire.{ Module, wire }
-import commons.CommonsComponents
-import commons.config.WithExecutionContextComponents
 import commons.models._
-import config.BaseComponent
 import play.api.ApplicationLoader
 import play.api.routing.Router
 import play.api.routing.sird._
@@ -18,10 +15,7 @@ import users.UserComponents
 
 @Module
 class ArticleComponents(context: ApplicationLoader.Context)
-  extends BaseComponent(context)
-    with UserComponents
-    with CommonsComponents
-    with WithExecutionContextComponents {
+  extends UserComponents(context) {
 
   private lazy val defaultOffset = 0L
   private lazy val defaultLimit = 20L
@@ -46,7 +40,7 @@ class ArticleComponents(context: ApplicationLoader.Context)
 
   lazy val favoriteAssociationRepo: FavoriteAssociationRepo = wire[FavoriteAssociationRepo]
 
-  val routes: Router.Routes = {
+  override val routes: Router.Routes = {
     case GET(p"/articles" ? q_o"limit=${long(maybeLimit)}" &
       q_o"offset=${long(maybeOffset)}" &
       q_o"tag=$maybeTag" &

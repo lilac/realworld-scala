@@ -2,20 +2,21 @@ package users
 
 import scala.concurrent.ExecutionContext
 
-import com.softwaremill.macwire.wire
-import commons.config.{ WithControllerComponents, WithExecutionContextComponents }
-import commons.models.Username
 import authentication.AuthenticationComponents
+import com.softwaremill.macwire.{ Module, wire }
+import commons.models.Username
+import config.BaseComponent
+import play.api.ApplicationLoader
+import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.routing.Router
 import play.api.routing.sird._
 import users.controllers.{ LoginController, ProfileController, UserController }
 import users.repositories.{ FollowAssociationRepo, ProfileRepo, UserRepo }
 import users.services._
-import play.api.libs.ws.ahc.AhcWSComponents
 
-trait UserComponents extends AuthenticationComponents
-  with WithControllerComponents
-  with WithExecutionContextComponents
+@Module
+class UserComponents(context: ApplicationLoader.Context) extends BaseComponent(context)
+  with AuthenticationComponents
   with AhcWSComponents {
   lazy val userController: UserController = wire[UserController]
   lazy val userService: UserService = wire[UserService]
@@ -38,7 +39,7 @@ trait UserComponents extends AuthenticationComponents
 
   lazy val loginController: LoginController = wire[LoginController]
 
-  val userRoutes: Router.Routes = {
+  val routes: Router.Routes = {
     case POST(p"/users") =>
       userController.register
     case GET(p"/user") =>
