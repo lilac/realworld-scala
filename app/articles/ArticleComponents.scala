@@ -2,21 +2,23 @@ package articles
 
 import scala.concurrent.ExecutionContext
 
-import com.softwaremill.macwire.wire
-import commons.config.{ WithControllerComponents, WithExecutionContextComponents }
-import commons.models._
 import articles.controllers.{ ArticleController, CommentController, TagController }
 import articles.models.{ ArticleMetaModel, CommentId, MainFeedPageRequest, UserFeedPageRequest }
 import articles.repositories._
 import articles.services._
-import authentication.api.AuthenticatedActionBuilder
+import com.softwaremill.macwire.{ Module, wire }
 import commons.CommonsComponents
-import users.UserComponents
+import commons.config.WithExecutionContextComponents
+import commons.models._
+import config.BaseComponent
+import play.api.ApplicationLoader
 import play.api.routing.Router
 import play.api.routing.sird._
+import users.UserComponents
 
-trait ArticleComponents
-  extends WithControllerComponents
+@Module
+class ArticleComponents(context: ApplicationLoader.Context)
+  extends BaseComponent(context)
     with UserComponents
     with CommonsComponents
     with WithExecutionContextComponents {
@@ -25,7 +27,7 @@ trait ArticleComponents
   private lazy val defaultLimit = 20L
   private implicit val ec: ExecutionContext = executionContext
 
-  def authenticatedAction: AuthenticatedActionBuilder
+  override lazy val router: Router = Router.from(articleRoutes)
 
   lazy val articleController: ArticleController = wire[ArticleController]
   lazy val articleWriteService: ArticleWriteService = wire[ArticleWriteService]

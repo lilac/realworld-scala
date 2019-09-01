@@ -29,6 +29,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.41",
 
   "com.softwaremill.macwire" %% "macros" % "2.3.1" % "provided",
+  "com.softwaremill.macwire" %% "util" % "2.3.1" % "provided",
 
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
 )
