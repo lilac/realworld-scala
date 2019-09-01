@@ -49,8 +49,8 @@ class RealWorldComponents(context: Context)
   with AuthenticationComponents
   with EhCacheComponents {
 
-  val articleComponents: ArticleComponents = wire[ArticleComponents]
-  private val userComponents = wire[UserComponents]
+  protected val userComponents: UserComponents = wire[UserComponents]
+  protected val articleComponents: ArticleComponents = wire[ArticleComponents]
   override lazy val dynamicEvolutions: DynamicEvolutions = new DynamicEvolutions
 
   def onStart(): Unit = {

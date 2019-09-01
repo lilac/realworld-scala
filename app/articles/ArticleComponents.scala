@@ -1,26 +1,25 @@
 package articles
 
-import scala.concurrent.ExecutionContext
-
 import articles.controllers.{ ArticleController, CommentController, TagController }
 import articles.models.{ ArticleMetaModel, CommentId, MainFeedPageRequest, UserFeedPageRequest }
 import articles.repositories._
 import articles.services._
 import com.softwaremill.macwire.{ Module, wire }
 import commons.models._
+import config.BaseComponent
 import play.api.ApplicationLoader
 import play.api.routing.Router
 import play.api.routing.sird._
 import users.UserComponents
 
 @Module
-class ArticleComponents(context: ApplicationLoader.Context)
-  extends UserComponents(context) {
+class ArticleComponents(context: ApplicationLoader.Context, userComponents: UserComponents)
+  extends BaseComponent(context) {
 
   private lazy val defaultOffset = 0L
   private lazy val defaultLimit = 20L
-  private implicit val ec: ExecutionContext = executionContext
 
+  import userComponents._
   lazy val articleController: ArticleController = wire[ArticleController]
   lazy val articleWriteService: ArticleWriteService = wire[ArticleWriteService]
   lazy val articleReadService: ArticleReadService = wire[ArticleReadService]
