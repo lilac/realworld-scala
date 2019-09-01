@@ -27,8 +27,6 @@ class ArticleComponents(context: ApplicationLoader.Context)
   private lazy val defaultLimit = 20L
   private implicit val ec: ExecutionContext = executionContext
 
-  override lazy val router: Router = Router.from(articleRoutes)
-
   lazy val articleController: ArticleController = wire[ArticleController]
   lazy val articleWriteService: ArticleWriteService = wire[ArticleWriteService]
   lazy val articleReadService: ArticleReadService = wire[ArticleReadService]
@@ -48,7 +46,7 @@ class ArticleComponents(context: ApplicationLoader.Context)
 
   lazy val favoriteAssociationRepo: FavoriteAssociationRepo = wire[FavoriteAssociationRepo]
 
-  val articleRoutes: Router.Routes = {
+  val routes: Router.Routes = {
     case GET(p"/articles" ? q_o"limit=${long(maybeLimit)}" &
       q_o"offset=${long(maybeOffset)}" &
       q_o"tag=$maybeTag" &
